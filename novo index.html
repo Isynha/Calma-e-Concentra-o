@@ -95,37 +95,37 @@
 </head>
 <body>
 
-<div id="circle" aria-label="Breathing animation"></div>
+<div id="circle"></div>
 
-<div class="controls" aria-labelledby="controls-label">
-    <button id="playPauseBtn" aria-live="polite">Play</button>
+<div class="controls">
+    <button id="playPauseBtn">Play</button>
     <div>
         <label for="inhaleTime">Inspirar (seg):</label>
-        <input type="number" id="inhaleTime" value="4" aria-live="polite">
+        <input type="number" id="inhaleTime" value="4">
     </div>
     <div>
         <label for="holdTime">Suster (seg):</label>
-        <input type="number" id="holdTime" value="4" aria-live="polite">
+        <input type="number" id="holdTime" value="4">
     </div>
     <div>
         <label for="exhaleTime">Expirar (seg):</label>
-        <input type="number" id="exhaleTime" value="4" aria-live="polite">
+        <input type="number" id="exhaleTime" value="4">
     </div>
     <div>
         <label for="meditationTime">Tempo (min):</label>
-        <input type="number" id="meditationTime" value="5" aria-live="polite">
+        <input type="number" id="meditationTime" value="5">
     </div>
     <div>
         <label for="bgUpload">Plano de Fundo:</label>
-        <input type="file" id="bgUpload" accept="image/*" aria-live="polite">
+        <input type="file" id="bgUpload" accept="image/*">
     </div>
     <div>
         <label for="musicUpload">Música:</label>
-        <input type="file" id="musicUpload" accept="audio/*" aria-live="polite">
+        <input type="file" id="musicUpload" accept="audio/*">
     </div>
 </div>
 
-<div id="message" aria-live="assertive">Parabéns pela sua meditação!</div>
+<div id="message">Parabéns pela sua meditação!</div>
 
 <audio id="audio" controls style="display: none;"></audio>
 
@@ -226,9 +226,9 @@
 
     document.addEventListener('fullscreenchange', () => {
         if (!document.fullscreenElement) {
-            circle.innerText = 'Clique para Tela Cheia';
+            circle.innerText = '';
         } else {
-            circle.innerText = 'Clique para Sair';
+            circle.innerText = '';
         }
     });
 
