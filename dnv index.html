@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meditação</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #72EDF2 10%, #5151E5 100%);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            color: white;
+            position: relative;
+        }
+        #circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            top: 20px;
+            cursor: pointer;
+        }
+        .controls {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: absolute;
+            bottom: 20px;
+            width: 90%;
+            max-width: 400px;
+        }
+        .controls div {
+            margin: 10px 0;
+        }
+        .controls label {
+            display: inline-block;
+            width: 150px;
+            text-align: right;
+            margin-right: 10px;
+        }
+        .controls input[type="number"], .controls input[type="file"] {
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: 60px;
+            text-align: center;
+        }
+        .controls button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background: #4CAF50;
+            color: white;
+            transition: background 0.3s;
+        }
+        .controls button:hover {
+            background: #45a049;
+        }
+        #message {
+            margin-top: 20px;
+            font-size: 1.5em;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+        }
+        audio {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="circle"></div>
+
+<div class="controls">
+    <button id="playPauseBtn">Play</button>
+    <div>
+        <label for="inhaleTime">Inspirar (seg):</label>
+        <input type="number" id="inhaleTime" value="4">
+    </div>
+    <div>
+        <label for="holdTime">Suster (seg):</label>
+        <input type="number" id="holdTime" value="4">
+    </div>
+    <div>
+        <label for="exhaleTime">Expirar (seg):</label>
+        <input type="number" id="exhaleTime" value="4">
+    </div>
+    <div>
+        <label for="meditationTime">Tempo (min):</label>
+        <input type="number" id="meditationTime" value="5">
+    </div>
+    <div>
+        <label for="bgUpload">Plano de Fundo:</label>
+        <input type="file" id="bgUpload" accept="image/*">
+    </div>
+    <div>
+        <label for="musicUpload">Música:</label>
+        <input type="file" id="musicUpload" accept="audio/*">
+    </div>
+</div>
+
+<div id="message">Parabéns pela sua meditação!</div>
+
+<audio id="audio" controls style="display: none;"></audio>
+
+<script>
+    const circle = document.getElementById('circle');
+    const inhaleTimeInput = document.getElementById('inhaleTime');
+    const holdTimeInput = document.getElementById('holdTime');
+    const exhaleTimeInput = document.getElementById('exhaleTime');
+    const meditationTimeInput = document.getElementById('meditationTime');
+    const bgUpload = document.getElementById('bgUpload');
+    const musicUpload = document.getElementById('musicUpload');
+    const audio = document.getElementById('audio');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const message = document.getElementById('message');
+
+    let inhaleTime = parseInt(inhaleTimeInput.value);
+    let holdTime = parseInt(holdTimeInput.value);
+    let exhaleTime = parseInt(exhaleTimeInput.value);
+    let meditationTime = parseInt(meditationTimeInput.value) * 60; // convert to seconds
+    let isRunning = false;
+    let breathTimeout;
+    let meditationInterval;
+
+    function updateBreathCycle() {
+        inhaleTime = parseInt(inhaleTimeInput.value);
+        holdTime = parseInt(holdTimeInput.value);
+        exhaleTime = parseInt(exhaleTimeInput.value);
+    }
+
+    function animateBreathing() {
+        if (!isRunning) return;
+
+        circle.style.transition = `${inhaleTime}s ease-in-out`;
+        circle.style.width = '300px';
+        circle.style.height = '300px';
+        
+        breathTimeout = setTimeout(() => {
+            if (!isRunning) return;
+
+            circle.style.transition = `${holdTime}s ease-in-out`;
+            
+            breathTimeout = setTimeout(() => {
+                if (!isRunning) return;
+
+                circle.style.transition = `${exhaleTime}s ease-in-out`;
+                circle.style.width = '100px';
+                circle.style.height = '100px';
+                
+                breathTimeout = setTimeout(animateBreathing, exhaleTime * 1000);
+            }, holdTime * 1000);
+        }, inhaleTime * 1000);
+    }
+
+    function startTimer(duration) {
+        let timer = duration, minutes, seconds;
+        meditationInterval = setInterval(() => {
+            if (!isRunning) {
+                clearInterval(meditationInterval);
+                return;
+            }
+
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+
+            if (--timer < 0) {
+                clearInterval(meditationInterval);
+                isRunning = false;
+                playPauseBtn.innerText = 'Play';
+                message.style.display = 'block';
+            }
+        }, 1000);
+    }
+
+    function togglePlayPause() {
+        if (!isRunning) {
+            isRunning = true;
+            playPauseBtn.innerText = 'Pause';
+            message.style.display = 'none';
+            animateBreathing();
+            startTimer(meditationTime);
+        } else {
+            isRunning = false;
+            playPauseBtn.innerText = 'Play';
+            clearTimeout(breathTimeout);
+            clearInterval(meditationInterval);
+        }
+    }
+
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+            circle.innerText = '';
+        } else {
+            circle.innerText = '';
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && document.fullscreenElement) {
+            document.exitFullscreen();
+        }
+    });
+
+    circle.addEventListener('click', toggleFullScreen);
+    inhaleTimeInput.addEventListener('input', updateBreathCycle);
+    holdTimeInput.addEventListener('input', updateBreathCycle);
+    exhaleTimeInput.addEventListener('input', updateBreathCycle);
+    meditationTimeInput.addEventListener('input', () => {
+        meditationTime = parseInt(meditationTimeInput.value) * 60;
+    });
+
+    bgUpload.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.body.style.backgroundImage = `url(${e.target.result})`;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            alert('Por favor, selecione um arquivo de imagem válido.');
+        }
+    });
+
+    musicUpload.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file && file.type.startsWith('audio/')) {
+            const url = URL.createObjectURL(file);
+            audio.src = url;
+            audio.style.display = 'block';
+        } else {
+            alert('Por favor, selecione um arquivo de áudio válido.');
+        }
+    });
+
+    playPauseBtn.addEventListener('click', togglePlayPause);
+</script>
+
+</body>
+</html>
